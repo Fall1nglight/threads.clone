@@ -1,0 +1,47 @@
+name: Backend - Reusable build and test
+run-name: Backend - Reusable build and test
+
+on:
+  workflow_call:
+    inputs:
+      DOTNET_VERSION:
+        required: true
+        type: string
+        
+      BUILD_CONFIGURATION:
+        required: true
+        type: string
+
+jobs:
+  reusable-build-and-test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.DOTNET_VERSION }}
+          
+      - name: Setup dependency caching
+        uses: actions/cache@v4
+        with: 
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('backend/**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+            
+      - name: Restore dependencies
+        run: dotnet restore
+          
+      - name: Build
+        run: dotnet build -c ${{ inputs.BUILD_CONFIGURATION }} --no-restore
+          
+      - name: Test
+        run: dotnet test -c ${{ inputs.BUILD_CONFIGURATION }} --no-build --no-restore --verbosity normal 

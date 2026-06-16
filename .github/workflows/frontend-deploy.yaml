@@ -1,0 +1,36 @@
+name: Frontend - Deploy
+run-name: Frontend - Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-deploy.yaml"
+
+env:
+  AZURE_SWA_ACTION: "upload"
+  AZURE_SWA_APP_LOCATION: "/frontend"
+  AZURE_SWA_OUTPUT_LOCATION: "dist"
+
+jobs:
+  deploy:
+    name: Deploy to Azure Static Web Apps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Build and deploy
+        id: deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_FRONTEND_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: ${{ env.AZURE_SWA_ACTION }}
+          app_location: ${{ env.AZURE_SWA_APP_LOCATION }}
+          output_location: ${{ env.AZURE_SWA_OUTPUT_LOCATION }}

@@ -1,0 +1,33 @@
+{
+  "name": "Threads.Api Dev container",
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "dotnet-app",
+  
+  "runServices": [
+    "dotnet-app",
+    "postgres-db"
+  ],
+  
+  "remoteUser": "root",
+  "workspaceFolder": "/workspaces/backend",
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
+  
+  "postCreateCommand": "dotnet restore /workspaces/backend/Threads.sln && dotnet tool restore",
+  
+  "customizations": {
+    "jetbrains": {
+      "backend": "Rider",
+      "plugins" : [
+        "com.intellij.csharpier",
+        "com.github.copilot",
+      ],
+    }
+  },
+  
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {
+      "version": "latest"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+name: Backend - Deploy
+run-name: Backend - Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-deploy.yaml"
+
+jobs:
+  build-and-test:
+    name: Build and test
+    uses: "./.github/workflows/reusable-backend-build-test.yaml"
+    with:
+      DOTNET_VERSION: "10.x"
+      BUILD_CONFIGURATION: Release
+      
+  deploy:
+    name: Deploy to Azure Container Apps
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v6
+    
+      - name: Azure Login
+        uses: Azure/login@v3
+        with: 
+          creds: ${{ secrets.AZURE_BACKEND_CREDENTIALS }}
+          
+      - name: Build and deploy app
+        uses: Azure/container-apps-deploy-action@v2
+        with: 
+          appSourcePath: ${{ github.workspace }}/backend
+          acrName: ${{ secrets.AZURE_BACKEND_ACR }}
+          containerAppName: ${{ secrets.AZURE_BACKEND_CONTAINER_APP_NAME }}
+          resourceGroup:  ${{ secrets.AZURE_RESOURCE_GROUP }}
+          targetPort: 8080

@@ -1,0 +1,19 @@
+name: Backend - PR check
+run-name: Backend - PR check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-pr.yaml"
+      - ".github/workflows/reusable-backend-build-test.yaml"
+
+jobs:
+  build-and-test:
+    uses: "./.github/workflows/reusable-backend-build-test.yaml"
+    with:
+      DOTNET_VERSION: "10.x"
+      BUILD_CONFIGURATION: Release

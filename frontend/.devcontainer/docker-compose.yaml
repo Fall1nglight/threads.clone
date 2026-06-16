@@ -1,0 +1,15 @@
+﻿name: frontend-dev-container
+services:
+  vite-app:
+    image: mcr.microsoft.com/devcontainers/typescript-node:24-bookworm
+    volumes:
+      - ../:/workspaces/frontend:cached
+      - node_modules:/workspaces/frontend/node_modules
+    command: sleep infinity
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+
+volumes:
+  node_modules:

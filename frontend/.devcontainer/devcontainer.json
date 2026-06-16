@@ -1,0 +1,22 @@
+{
+  "name": "Threads frontend",
+  "dockerComposeFile": "docker-compose.yaml",
+  "service": "vite-app",
+  "workspaceFolder": "/workspaces/frontend",
+  "remoteUser": "root",
+  "shutdownAction": "stopCompose",
+
+  "postCreateCommand": "npm install",
+
+  "customizations": {
+    "jetbrains": {
+      "backend": "WebStorm"
+    }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {
+      "version": "latest"
+    }
+  }
+}
