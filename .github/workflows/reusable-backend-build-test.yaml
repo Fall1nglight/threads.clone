@@ -1,5 +1,4 @@
 name: Backend - Reusable build and test
-run-name: Backend - Reusable build and test
 
 on:
   workflow_call:

@@ -1,5 +1,4 @@
 name: Frontend - Deploy
-run-name: Frontend - Deploy
 
 on:
   push:

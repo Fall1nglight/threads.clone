@@ -1,5 +1,4 @@
 name: Backend - PR check
-run-name: Backend - PR check
 
 on:
   pull_request:

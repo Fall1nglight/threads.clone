@@ -1,5 +1,4 @@
 name: Backend - Deploy
-run-name: Backend - Deploy
 
 on:
   push:

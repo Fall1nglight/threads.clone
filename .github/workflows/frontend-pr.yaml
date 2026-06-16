@@ -1,6 +1,4 @@
 name: Frontend - PR check
-run-name: Frontend - PR check
-
 
 on:
   pull_request:
