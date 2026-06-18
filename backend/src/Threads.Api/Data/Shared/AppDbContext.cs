@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Threads.Api.Data.Follows;
 using Threads.Api.Data.Posts;
 using Threads.Api.Data.Users;
 
@@ -13,6 +14,7 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Post> Posts { get; set; }
+    public DbSet<Follow> Follows { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
