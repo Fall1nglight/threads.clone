@@ -6,6 +6,5 @@ builder.AddServices();
 var app = builder.Build();
 
 app.MapGet("/api", () => "Hello World!");
-app.Map("/api/test", () => "test123");
-
+app.Configure();
 app.Run();
