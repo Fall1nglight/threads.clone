@@ -1,9 +1,12 @@
-﻿namespace Threads.Api;
+﻿using Serilog;
+
+namespace Threads.Api;
 
 public static class ConfigureApp
 {
     public static WebApplication Configure(this WebApplication app)
     {
+        app.UseSerilogRequestLogging();
         app.UseExceptionHandler();
         app.UseStatusCodePages();
         return app;

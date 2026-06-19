@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared;
 
@@ -17,6 +18,7 @@ public static class ConfigureServices
         AddDatabase(builder);
         AddProblemDetails(builder);
         AddGlobalErrorHandler(builder);
+        AddLogger(builder);
         return builder;
     }
 
@@ -49,5 +51,20 @@ public static class ConfigureServices
     private static void AddGlobalErrorHandler(WebApplicationBuilder builder)
     {
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    }
+
+    /// <summary>
+    /// Configures and adds the logging services to the application builder.
+    /// </summary>
+    /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure.</param>
+    private static void AddLogger(WebApplicationBuilder builder)
+    {
+        // todo: add Azure application insights
+        builder.Services.AddSerilog(
+            (services, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(builder.Configuration);
+            }
+        );
     }
 }
