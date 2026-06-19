@@ -6,10 +6,15 @@ namespace Threads.Api.Common;
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly IProblemDetailsService _problemDetailsService;
+    private readonly ILogger<GlobalExceptionHandler> _logger;
 
-    public GlobalExceptionHandler(IProblemDetailsService problemDetailsService)
+    public GlobalExceptionHandler(
+        IProblemDetailsService problemDetailsService,
+        ILogger<GlobalExceptionHandler> logger
+    )
     {
         _problemDetailsService = problemDetailsService;
+        _logger = logger;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -18,6 +23,14 @@ public class GlobalExceptionHandler : IExceptionHandler
         CancellationToken cancellationToken
     )
     {
+        var requestPath = string.Concat(httpContext.Request.Path, httpContext.Request.QueryString);
+
+        _logger.LogError(
+            exception,
+            "Unhandled exception occurred while processing the request at {RequestPath}.",
+            requestPath
+        );
+
         return await _problemDetailsService.TryWriteAsync(
             new ProblemDetailsContext()
             {
