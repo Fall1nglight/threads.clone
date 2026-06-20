@@ -11,7 +11,6 @@ try
     builder.AddServices();
 
     var app = builder.Build();
-    app.MapGet("/", () => "Homepage");
     app.Configure();
     app.Run();
 }
