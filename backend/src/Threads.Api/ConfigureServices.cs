@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared;
@@ -19,6 +20,7 @@ public static class ConfigureServices
         AddProblemDetails(builder);
         AddGlobalErrorHandler(builder);
         AddLogger(builder);
+        AddValidators(builder);
         return builder;
     }
 
@@ -63,8 +65,20 @@ public static class ConfigureServices
         builder.Services.AddSerilog(
             (services, configuration) =>
             {
-                configuration.ReadFrom.Configuration(builder.Configuration);
+                configuration
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .ReadFrom.Services(services);
             }
         );
+    }
+
+    /// <summary>
+    /// Configures and adds FluentValidation validators to the application builder
+    /// by scanning the specified assembly for validator implementations.
+    /// </summary>
+    /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure.</param>
+    private static void AddValidators(WebApplicationBuilder builder)
+    {
+        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
     }
 }
