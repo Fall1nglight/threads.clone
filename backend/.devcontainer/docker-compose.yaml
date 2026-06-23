@@ -10,6 +10,8 @@ services:
       ConnectionStrings__PostgreSql: "Host=postgres-db;Port=5432;Database=${POSTGRES_DB?error};Username=${POSTGRES_USER?error};Password=${POSTGRES_PASSWORD?error}"
     volumes:
       - ../../:/workspaces/threads:cached
+    ports:
+      - "8080:8080"
     depends_on:
       postgres-db:
         condition: service_healthy

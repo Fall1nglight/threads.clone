@@ -8,6 +8,10 @@
     "postgres-db"
   ],
   
+  forwardPorts: [
+    8080
+  ],
+  
   "remoteUser": "root",
   "workspaceFolder": "/workspaces/threads/backend",
   "shutdownAction": "stopCompose",
