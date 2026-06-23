@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared;
+using Threads.Api.Data.Users;
 
 namespace Threads.Api;
 
@@ -17,6 +19,7 @@ public static class ConfigureServices
     {
         // note: return WebApplicationBuilder instead of void to enable method chaining
         AddDatabase(builder);
+        AddIdentity(builder);
         AddProblemDetails(builder);
         AddGlobalErrorHandler(builder);
         AddLogger(builder);
@@ -34,6 +37,13 @@ public static class ConfigureServices
         {
             option.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"));
         });
+    }
+
+    private static void AddIdentity(WebApplicationBuilder builder)
+    {
+        builder
+            .Services.AddIdentity<User, IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<AppDbContext>();
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared.Interfaces;
 
@@ -21,12 +20,12 @@ public class Login : IEndpoint
     {
         public LoginValidator()
         {
-            RuleFor(x => x.Email).EmailAddress();
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.Email).EmailAddress().MaximumLength(100);
+            RuleFor(x => x.Password).NotEmpty().MaximumLength(40);
         }
     }
 
-    private static async Task<Ok<Response>> Handle([FromBody] Request request)
+    private static async Task<Ok<Response>> Handle(Request request)
     {
         // do some work
         return TypedResults.Ok(new Response("test"));
