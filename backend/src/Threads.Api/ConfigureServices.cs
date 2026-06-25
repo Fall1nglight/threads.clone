@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Users;
+using Threads.Api.Features.Auth.Services.JwtProvider;
 
 namespace Threads.Api;
 
@@ -19,7 +21,7 @@ public static class ConfigureServices
     {
         // note: return WebApplicationBuilder instead of void to enable method chaining
         AddDatabase(builder);
-        AddIdentity(builder);
+        AddAuth(builder);
         AddProblemDetails(builder);
         AddGlobalErrorHandler(builder);
         AddLogger(builder);
@@ -39,11 +41,38 @@ public static class ConfigureServices
         });
     }
 
-    private static void AddIdentity(WebApplicationBuilder builder)
+    private static void AddAuth(WebApplicationBuilder builder)
     {
         builder
-            .Services.AddIdentity<User, IdentityRole<Guid>>()
+            .Services.AddIdentityCore<User>(options =>
+            {
+                // disable identity's validation because FluentValidation is preferred
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 0;
+
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<AppDbContext>();
+
+        // configures the token provider service
+        builder.Services.ConfigureOptions<JwtProviderOptionsSetup>();
+        builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+        builder
+            .Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme);
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddScoped<IJwtProvider, JwtProvider>();
     }
 
     /// <summary>
@@ -71,7 +100,6 @@ public static class ConfigureServices
     /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure.</param>
     private static void AddLogger(WebApplicationBuilder builder)
     {
-        // todo: add Azure application insights
         builder.Services.AddSerilog(
             (services, configuration) =>
             {
