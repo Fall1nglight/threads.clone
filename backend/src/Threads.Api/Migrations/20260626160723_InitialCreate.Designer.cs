@@ -12,7 +12,7 @@ using Threads.Api.Data.Shared;
 namespace Threads.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260623200516_InitialCreate")]
+    [Migration("20260626160723_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -210,6 +210,45 @@ namespace Threads.Api.Migrations
                     b.ToTable("Posts", "social");
                 });
 
+            modelBuilder.Entity("Threads.Api.Data.Tokens.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ReplacedByTokenId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RevocationReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(44)
+                        .HasColumnType("character varying(44)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReplacedByTokenId")
+                        .IsUnique();
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens", "social");
+                });
+
             modelBuilder.Entity("Threads.Api.Data.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -370,6 +409,24 @@ namespace Threads.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Threads.Api.Data.Tokens.RefreshToken", b =>
+                {
+                    b.HasOne("Threads.Api.Data.Tokens.RefreshToken", "ReplacedByToken")
+                        .WithOne()
+                        .HasForeignKey("Threads.Api.Data.Tokens.RefreshToken", "ReplacedByTokenId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Threads.Api.Data.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReplacedByToken");
 
                     b.Navigation("User");
                 });
