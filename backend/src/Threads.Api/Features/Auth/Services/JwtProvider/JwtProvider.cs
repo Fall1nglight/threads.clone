@@ -19,7 +19,7 @@ public class JwtProvider : IJwtProvider
         _options = options;
     }
 
-    public async Task<string> GenerateJwt(User user)
+    public async Task<string> GenerateAsync(User user)
     {
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.SecretKey));
         var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);

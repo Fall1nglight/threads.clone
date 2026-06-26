@@ -4,5 +4,5 @@ namespace Threads.Api.Features.Auth.Services.JwtProvider;
 
 public interface IJwtProvider
 {
-    public Task<string> GenerateJwt(User user);
+    Task<string> GenerateAsync(User user);
 }

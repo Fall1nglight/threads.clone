@@ -7,6 +7,7 @@ using Threads.Api.Common;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Users;
 using Threads.Api.Features.Auth.Services.JwtProvider;
+using Threads.Api.Features.Auth.Services.RefreshToken;
 
 namespace Threads.Api;
 
@@ -46,14 +47,6 @@ public static class ConfigureServices
         builder
             .Services.AddIdentityCore<User>(options =>
             {
-                // disable identity's validation because FluentValidation is preferred
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 1;
-                options.Password.RequiredUniqueChars = 0;
-
                 options.User.RequireUniqueEmail = true;
             })
             .AddRoles<IdentityRole<Guid>>()
@@ -61,7 +54,11 @@ public static class ConfigureServices
 
         // configures the token provider service
         builder.Services.ConfigureOptions<JwtProviderOptionsSetup>();
+
+        // configures TokenValidationParameters
         builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+        builder.Services.ConfigureOptions<RefreshTokenOptionsSetup>();
 
         builder
             .Services.AddAuthentication(options =>
@@ -73,6 +70,8 @@ public static class ConfigureServices
 
         builder.Services.AddAuthorization();
         builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+        builder.Services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
+        builder.Services.AddScoped<IRefreshTokenManager, RefreshTokenManager>();
     }
 
     /// <summary>
