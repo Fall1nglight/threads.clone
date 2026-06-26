@@ -1,7 +1,7 @@
 ﻿using Threads.Api.Common.Filters;
 using Threads.Api.Data.Shared.Interfaces;
 
-namespace Threads.Api.Common;
+namespace Threads.Api.Common.Extensions;
 
 public static class RouteBuilderExtensions
 {
