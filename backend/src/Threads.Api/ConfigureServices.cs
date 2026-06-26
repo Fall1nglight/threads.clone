@@ -1,8 +1,13 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Threads.Api.Common;
 using Threads.Api.Data.Shared;
+using Threads.Api.Data.Users;
+using Threads.Api.Features.Auth.Services.JwtProvider;
+using Threads.Api.Features.Auth.Services.RefreshToken;
 
 namespace Threads.Api;
 
@@ -17,6 +22,7 @@ public static class ConfigureServices
     {
         // note: return WebApplicationBuilder instead of void to enable method chaining
         AddDatabase(builder);
+        AddAuth(builder);
         AddProblemDetails(builder);
         AddGlobalErrorHandler(builder);
         AddLogger(builder);
@@ -34,6 +40,38 @@ public static class ConfigureServices
         {
             option.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"));
         });
+    }
+
+    private static void AddAuth(WebApplicationBuilder builder)
+    {
+        builder
+            .Services.AddIdentityCore<User>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<AppDbContext>();
+
+        // configures the token provider service
+        builder.Services.ConfigureOptions<JwtProviderOptionsSetup>();
+
+        // configures TokenValidationParameters
+        builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+        builder.Services.ConfigureOptions<RefreshTokenOptionsSetup>();
+
+        builder
+            .Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme);
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+        builder.Services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
+        builder.Services.AddScoped<IRefreshTokenManager, RefreshTokenManager>();
     }
 
     /// <summary>
@@ -61,7 +99,6 @@ public static class ConfigureServices
     /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure.</param>
     private static void AddLogger(WebApplicationBuilder builder)
     {
-        // todo: add Azure application insights
         builder.Services.AddSerilog(
             (services, configuration) =>
             {

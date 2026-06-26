@@ -7,6 +7,8 @@ public class FollowConfiguration : IEntityTypeConfiguration<Follow>
 {
     public void Configure(EntityTypeBuilder<Follow> builder)
     {
+        builder.HasKey(x => new { x.FollowerId, x.FollowedId });
+
         // enables to store Enums as strings in the database
         //  which improves readability
         builder.Property(x => x.Status).HasConversion<string>();

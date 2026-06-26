@@ -9,16 +9,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         // IsRequired() is unnecessary for required properties
         //  and also for value types
-
         // DateTime properties are not configured because
         //  there is no additional information about them
 
         builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.Username).IsUnique();
+        
         builder.HasIndex(x => x.Email).IsUnique();
-        builder.Property(x => x.Username).HasMaxLength(30);
+
         builder.Property(x => x.Email).HasMaxLength(100);
-        builder.Property(x => x.HashedPassword).HasMaxLength(60);
         builder.Property(x => x.Bio).HasMaxLength(300);
         builder.Property(x => x.IsPrivate).HasDefaultValue(false);
     }
