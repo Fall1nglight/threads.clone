@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Threads.Api.Common;
-using Threads.Api.Data.Shared;
+using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared.Interfaces;
 using Threads.Api.Data.Users;
 using Threads.Api.Features.Auth.Services.JwtProvider;
+using Threads.Api.Features.Auth.Services.RefreshToken;
 
 namespace Threads.Api.Features.Auth.Endpoints;
 
@@ -18,7 +18,7 @@ public class Login : IEndpoint
 
     public record Request(string Email, string Password);
 
-    public record Response(string AccessToken);
+    public record Response(string AccessToken, string RefreshToken);
 
     public class LoginValidator : AbstractValidator<Request>
     {
@@ -38,14 +38,12 @@ public class Login : IEndpoint
 
     private static async Task<Results<Ok<Response>, UnauthorizedHttpResult>> Handle(
         Request request,
-        AppDbContext db,
         UserManager<User> userManager,
         IJwtProvider jwtProvider,
+        IRefreshTokenManager rtManager,
         CancellationToken cancellationToken
     )
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
-
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
             return TypedResults.Unauthorized();
@@ -54,10 +52,10 @@ public class Login : IEndpoint
         if (!isValidPassword)
             return TypedResults.Unauthorized();
 
-        var accessToken = await jwtProvider.GenerateJwt(user);
-        var response = new Response(accessToken);
+        var accessToken = await jwtProvider.GenerateAsync(user);
+        var refreshToken = await rtManager.GenerateAsync(user.Id, cancellationToken);
+        var response = new Response(accessToken, refreshToken);
 
-        await transaction.CommitAsync(cancellationToken);
         return TypedResults.Ok(response);
     }
 }

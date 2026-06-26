@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Threads.Api.Common;
+using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Shared.Interfaces;
 using Threads.Api.Data.Users;
 using Threads.Api.Features.Auth.Services.JwtProvider;
+using Threads.Api.Features.Auth.Services.RefreshToken;
 
 namespace Threads.Api.Features.Auth.Endpoints;
 
@@ -24,7 +25,7 @@ public class Signup : IEndpoint
         string? Bio
     );
 
-    public record Response(string AccessToken);
+    public record Response(string AccessToken, string RefreshToken);
 
     public class SignupValidator : AbstractValidator<Request>
     {
@@ -55,11 +56,10 @@ public class Signup : IEndpoint
         AppDbContext db,
         UserManager<User> userManager,
         IJwtProvider jwtProvider,
+        IRefreshTokenManager rtManager,
         CancellationToken cancellationToken
     )
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
-
         var newUser = new User()
         {
             Email = request.Email,
@@ -69,14 +69,15 @@ public class Signup : IEndpoint
             CreatedAtUtc = DateTime.UtcNow,
         };
 
-        var result = await userManager.CreateAsync(newUser, request.Password);
+        IdentityResult result = await userManager.CreateAsync(newUser, request.Password);
+
         if (!result.Succeeded)
             return TypedResults.BadRequest(result.Errors);
 
-        var accessToken = await jwtProvider.GenerateJwt(newUser);
-        var response = new Response(accessToken);
+        var accessToken = await jwtProvider.GenerateAsync(newUser);
+        var refreshToken = await rtManager.GenerateAsync(newUser.Id, cancellationToken);
+        var response = new Response(accessToken, refreshToken);
 
-        await transaction.CommitAsync(cancellationToken);
         return TypedResults.Ok(response);
     }
 }
