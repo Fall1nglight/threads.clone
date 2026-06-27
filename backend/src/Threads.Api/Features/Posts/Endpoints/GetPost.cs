@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Follows;
-using Threads.Api.Data.Posts;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Shared.Interfaces;
 
