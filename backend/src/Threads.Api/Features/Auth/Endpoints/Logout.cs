@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared.Interfaces;
-using Threads.Api.Data.Users;
 using Threads.Api.Features.Auth.Services.RefreshToken;
 
 namespace Threads.Api.Features.Auth.Endpoints;
