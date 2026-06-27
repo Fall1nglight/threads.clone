@@ -29,7 +29,12 @@ public class RequestValidationFilter<TRequest> : IEndpointFilter
             return await next.Invoke(context);
         }
 
-        var requestDto = context.GetArgument<TRequest>(0);
+        var requestDto = context.Arguments.OfType<TRequest>().FirstOrDefault();
+        if (requestDto == null)
+            throw new InvalidOperationException(
+                $"Developer error: Parameter of type '{typeof(TRequest).Name}' was not found in the endpoint signature."
+            );
+
         var result = await _validator.ValidateAsync(requestDto);
 
         if (!result.IsValid)
