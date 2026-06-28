@@ -1,9 +1,10 @@
-﻿using FluentValidation;
+﻿using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Threads.Api.Common;
+using Threads.Api.Common.ExceptionHandlers;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Users;
 using Threads.Api.Features.Auth.Services.JwtProvider;
@@ -24,6 +25,7 @@ public static class ConfigureServices
         AddDatabase(builder);
         AddAuth(builder);
         AddProblemDetails(builder);
+        AddJsonExceptionHandler(builder);
         AddGlobalErrorHandler(builder);
         AddLogger(builder);
         AddValidators(builder);
@@ -117,5 +119,15 @@ public static class ConfigureServices
     private static void AddValidators(WebApplicationBuilder builder)
     {
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+    }
+
+    private static void AddJsonExceptionHandler(WebApplicationBuilder builder)
+    {
+        builder.Services.AddExceptionHandler<JsonExceptionHandler>();
+
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
+        });
     }
 }
