@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Threads.Api.Common;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared.Interfaces;
 using Threads.Api.Data.Users;
@@ -36,7 +38,7 @@ public class Login : IEndpoint
         }
     }
 
-    private static async Task<Results<Ok<Response>, UnauthorizedHttpResult>> Handle(
+    private static async Task<Results<Ok<Response>, ProblemHttpResult>> Handle(
         Request request,
         UserManager<User> userManager,
         IJwtProvider jwtProvider,
@@ -46,11 +48,11 @@ public class Login : IEndpoint
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return TypedResults.Unauthorized();
+            return CustomResults.Unauthorized("The provided email is incorrect.");
 
         var isValidPassword = await userManager.CheckPasswordAsync(user, request.Password);
         if (!isValidPassword)
-            return TypedResults.Unauthorized();
+            return CustomResults.Unauthorized("The provided password is incorrect");
 
         var accessToken = await jwtProvider.GenerateAsync(user);
         var refreshToken = await rtManager.GenerateAsync(user.Id, cancellationToken);

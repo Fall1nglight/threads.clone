@@ -51,7 +51,7 @@ public class Signup : IEndpoint
         }
     }
 
-    private static async Task<Results<Ok<Response>, BadRequest<IEnumerable<IdentityError>>>> Handle(
+    private static async Task<Results<Ok<Response>, ProblemHttpResult>> Handle(
         Request request,
         AppDbContext db,
         UserManager<User> userManager,
@@ -72,7 +72,11 @@ public class Signup : IEndpoint
         IdentityResult result = await userManager.CreateAsync(newUser, request.Password);
 
         if (!result.Succeeded)
-            return TypedResults.BadRequest(result.Errors);
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Signup failed",
+                detail: "The provided username or email is already in use."
+            );
 
         var accessToken = await jwtProvider.GenerateAsync(newUser);
         var refreshToken = await rtManager.GenerateAsync(newUser.Id, cancellationToken);
