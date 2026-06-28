@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Shared.Interfaces;
@@ -52,7 +53,7 @@ public class Signup : IEndpoint
     }
 
     private static async Task<Results<Ok<Response>, ProblemHttpResult>> Handle(
-        Request request,
+        [FromBody] Request request,
         AppDbContext db,
         UserManager<User> userManager,
         IJwtProvider jwtProvider,

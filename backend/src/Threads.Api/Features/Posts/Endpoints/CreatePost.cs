@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Posts;
 using Threads.Api.Data.Shared;
@@ -26,7 +27,7 @@ public class CreatePost : IEndpoint
     }
 
     private static async Task<Created<PostDto>> Handle(
-        Request request,
+        [FromBody] Request request,
         AppDbContext db,
         ClaimsPrincipal claimsPrincipal,
         CancellationToken cancellationToken
