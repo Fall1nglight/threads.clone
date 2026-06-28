@@ -39,7 +39,7 @@ public class Login : IEndpoint
     }
 
     private static async Task<Results<Ok<Response>, ProblemHttpResult>> Handle(
-        Request request,
+        [FromBody] Request request,
         UserManager<User> userManager,
         IJwtProvider jwtProvider,
         IRefreshTokenManager rtManager,

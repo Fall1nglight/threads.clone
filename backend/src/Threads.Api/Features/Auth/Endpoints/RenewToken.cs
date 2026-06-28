@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Threads.Api.Common.Extensions;
 using Threads.Api.Data.Shared.Interfaces;
 using Threads.Api.Features.Auth.Services.JwtProvider;
@@ -30,7 +31,7 @@ public class RenewToken : IEndpoint
     }
 
     private static async Task<Results<Ok<Response>, BadRequest>> Handle(
-        Request request,
+        [FromBody] Request request,
         IJwtProvider jwtProvider,
         IRefreshTokenManager rtManager,
         CancellationToken cancellationToken
