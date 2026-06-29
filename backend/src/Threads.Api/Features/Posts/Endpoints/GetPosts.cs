@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+using Threads.Api.Common.Pagination;
 using Threads.Api.Data.Shared;
 using Threads.Api.Data.Shared.Interfaces;
 
@@ -12,15 +12,16 @@ public class GetPosts : IEndpoint
         builder.MapGet("/", Handle).WithSummary("Retrieves posts from public accounts");
     }
 
-    private static async Task<Ok<List<PostDto>>> Handle(
+    private static async Task<Ok<PagedResponse<PostDto>>> Handle(
+        [AsParameters] PagedRequest request,
         AppDbContext db,
         CancellationToken cancellationToken
     )
     {
         var posts = await db
             .Posts.Where(p => !p.User.IsPrivate)
-            .ProjectToResponse()
-            .ToListAsync(cancellationToken);
+            .ToDto()
+            .ToPagedResponse(request, cancellationToken);
 
         return TypedResults.Ok(posts);
     }
