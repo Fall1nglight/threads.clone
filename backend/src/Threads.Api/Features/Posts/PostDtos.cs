@@ -1,6 +1,8 @@
+using Threads.Api.Common.Pagination;
+
 namespace Threads.Api.Features.Posts;
 
-public record PostDto()
+public record PostDto : ICursorItem
 {
     public required Guid Id { get; init; }
     public required UserDto User { get; init; }
@@ -9,7 +11,7 @@ public record PostDto()
     public DateTime? UpdatedAtUtc { get; init; }
 };
 
-public record UserDto()
+public record UserDto
 {
     public required Guid Id { get; init; }
     public required string Username { get; init; }
