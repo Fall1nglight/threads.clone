@@ -5,7 +5,7 @@ namespace Threads.Api.Features.Posts;
 
 public static class PostExtensions
 {
-    public static IQueryable<PostDto> ProjectToResponse(this IQueryable<Post> query)
+    public static IQueryable<PostDto> ToDto(this IQueryable<Post> query)
     {
         return query.Select(post => new PostDto
         {
@@ -17,9 +17,9 @@ public static class PostExtensions
         });
     }
 
-    public static PostDto ToResponse(this Post post) => post.ToResponse(post.User);
+    public static PostDto ToDto(this Post post) => post.ToDto(post.User);
 
-    public static PostDto ToResponse(this Post post, User user)
+    public static PostDto ToDto(this Post post, User user)
     {
         return new PostDto
         {

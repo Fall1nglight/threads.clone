@@ -46,7 +46,7 @@ public class CreatePost : IEndpoint
         await db.SaveChangesAsync(cancellationToken);
         await db.Entry(post).Reference(p => p.User).LoadAsync(cancellationToken);
 
-        PostDto response = post.ToResponse();
+        PostDto response = post.ToDto();
 
         return TypedResults.Created($"/posts/{post.Id}", response);
     }

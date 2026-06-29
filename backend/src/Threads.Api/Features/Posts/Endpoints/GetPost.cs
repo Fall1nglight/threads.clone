@@ -65,7 +65,7 @@ public class GetPost : IEndpoint
                 return TypedResults.Forbid();
         }
 
-        PostDto response = post.ToResponse();
+        PostDto response = post.ToDto();
         return TypedResults.Ok(response);
     }
 }
